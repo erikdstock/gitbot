@@ -16,8 +16,8 @@ module.exports = (robot) => {
     gh.getIssues(user, repo).getIssue(num)
       .then(i => {
         const isPR = !!i.data.pull_request
-        const { url, title, state } = i.data
-        res.send(`<${url}|${fullMatch}]${isPR ? '-PR: ' : ': '}>${state === 'closed' ? 'CLOSED' : 'OPEN'})\n\t>${title}`)
+        const { html_url, title, state } = i.data
+        res.send(`<${html_url}|${fullMatch}]${isPR ? '-PR: ' : ': '}>${state === 'closed' ? 'CLOSED' : 'OPEN'})\n\t>${title}`)
       })
   })
 
