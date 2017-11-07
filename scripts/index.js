@@ -23,12 +23,14 @@ module.exports = (robot) => {
 
 const handleIssue = res => {
   const [ fullMatch, user, repo, num ] = res.match
+  const niceName = `${user}/${repo}#${num}`
   gh.getIssues(user, repo).getIssue(num)
     .then(
       (i) => {
         const isPR = !!i.data.pull_request
         const { html_url, title, state } = i.data
-        res.send(`${isPR ? '[PR]\t' : '[Issue]\t'}<${html_url}|${fullMatch}>:\t${state === 'closed' ? '(Closed)' : '(Open)'}\n>${title}`)
+        res.send(`${isPR ? '[PR]\t' : '[Issue]\t'}<${html_url}|${niceName}>:\t${state === 'closed' ? '(Closed)' : '(Open)'}\n>${title}`)
       },
-      (r) => res.send(`>Couldn't find an issue/pr like ${user}/${repo}#${num}`))
+      (r) => res.send(`>Couldn't find an issue/pr like ${niceName}`)
+    )
 }
