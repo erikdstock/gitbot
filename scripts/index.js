@@ -5,21 +5,15 @@ require('dotenv').config()
 
 const gh = new GitHub({token: process.env.GITHUB_TOKEN})
 
-const issueRegex = /(?:\s?)([\w-]+)\/([\w-]+)#([0-9]+)(?:.*)$/i
+const issueRegex = /(?:\s?)([\w-_]+)\/([\w-_]+)#([0-9]+)(?:.*)$/i
+const issueUrlRegex = /https?:\/\/github\.com\/([\w-_]+)\/([\w-_]+)\/(?:pull|issue)\/([0-9]+)/i
 
 module.exports = (robot) => {
 
-  robot.hear(/hello robot/, res => res.send('hello back'))
 
-  robot.hear(issueRegex, res => {
-    const [ fullMatch, user, repo, num ] = res.match
-    gh.getIssues(user, repo).getIssue(num)
-      .then(i => {
-        const isPR = !!i.data.pull_request
-        const { html_url, title, state } = i.data
-        res.send(`${isPR ? '[PR]\t' : '[ISSUE]\t'}<${html_url}|${fullMatch}>: '}>${state === 'closed' ? 'CLOSED' : 'OPEN'})\n>${title}`)
-      })
-  })
+  robot.hear(issueRegex, handleIssue)
+
+  robot.hear(issueUrlRegex, handleIssue)
 
   robot.router.post('/test', (req, res) => {
     robot.send({ room: req.params.room }, `Received HTTP request: ${req.body.value}`)
@@ -27,10 +21,16 @@ module.exports = (robot) => {
   })
 }
 
-const handleIssue = (resp) => i => {
-  const isPR = !!i.data.pull_request
-  const { url, title, state } = i.data
-  resp.send(`<${url}|${fullMatch}]>: [${state === 'closed' ? 'CLOSED' : 'OPEN'}]`)
+const handleIssue = res => {
+  const [ fullMatch, user, repo, num ] = res.match
+  gh.getIssues(user, repo).getIssue(num)
+    .then(
+      (i) => {
+        const isPR = !!i.data.pull_request
+        const { html_url, title, state } = i.data
+        res.send(`${isPR ? '[PR]\t' : '[ISSUE]\t'}<${html_url}|${fullMatch}>:\t'${state === 'closed' ? '(Closed)' : '(Open)'}\n>${title}`)
+      },
+      (r) => res.send(`>Couldn't find an issue/pr like ${user}/${repo}#${num}`))
 }
 
 // const findMatches = (text, acc = []) => {
