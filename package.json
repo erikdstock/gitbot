@@ -12,6 +12,7 @@
   "author": "erik.d.stock@gmail.com",
   "description": "I fill in github issue mentions",
   "dependencies": {
+    "babel-register": "^6.26.0",
     "coffee-script": "^1.12.7",
     "github-api": "^3.0.0",
     "hubot": "^2.19.0",
