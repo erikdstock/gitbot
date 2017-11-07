@@ -6,7 +6,7 @@ require('dotenv').config()
 const gh = new GitHub({token: process.env.GITHUB_TOKEN})
 
 const issueRegex = /(?:\s?)([\w-_]+)\/([\w-_]+)#([0-9]+)(?:.*)$/i
-const issueUrlRegex = /https?:\/\/github\.com\/([\w-_]+)\/([\w-_]+)\/(?:pull|issue)\/([0-9]+)/i
+const issueUrlRegex = /https?:\/\/github\.com\/([\w-_]+)\/([\w-_]+)\/(?:pull|issue)s?\/([0-9]+)/i
 
 module.exports = (robot) => {
 
@@ -28,16 +28,7 @@ const handleIssue = res => {
       (i) => {
         const isPR = !!i.data.pull_request
         const { html_url, title, state } = i.data
-        res.send(`${isPR ? '[PR]\t' : '[ISSUE]\t'}<${html_url}|${fullMatch}>:\t'${state === 'closed' ? '(Closed)' : '(Open)'}\n>${title}`)
+        res.send(`${isPR ? '[PR]\t' : '[Issue]\t'}<${html_url}|${fullMatch}>:\t${state === 'closed' ? '(Closed)' : '(Open)'}\n>${title}`)
       },
       (r) => res.send(`>Couldn't find an issue/pr like ${user}/${repo}#${num}`))
 }
-
-// const findMatches = (text, acc = []) => {
-//   const match = issueRegex.exec(text)
-//   if (match) {
-//     const [ fullMatch, user, repo, num, index ] = match
-//     const nextText = text.slice(index).replace(fullMatch, '')
-//     return findMatches(nextText, acc.push({user, repo, num}))
-//   } else return acc
-// }
