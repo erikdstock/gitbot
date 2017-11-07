@@ -1,5 +1,5 @@
 require("babel-register")
-if (process.env.NPM_CONFIG_PRODUCTION) {
+if (process.env.NPM_ENV === 'production') {
   require("dotenv").config()
 }
 // keep hubot from complaining
