@@ -17,7 +17,7 @@ module.exports = (robot) => {
       .then(i => {
         const isPR = !!i.data.pull_request
         const { html_url, title, state } = i.data
-        res.send(`<${html_url}|${fullMatch}]${isPR ? '-PR: ' : ': '}>${state === 'closed' ? 'CLOSED' : 'OPEN'})\n\t>${title}`)
+        res.send(`${isPR ? '[PR]\t' : '[ISSUE]\t'}<${html_url}|${fullMatch}>: '}>${state === 'closed' ? 'CLOSED' : 'OPEN'})\n>${title}`)
       })
   })
 
