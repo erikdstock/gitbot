@@ -12,15 +12,12 @@ module.exports = (robot) => {
   robot.hear(/hello robot/, res => res.send('hello back'))
 
   robot.hear(issueRegex, res => {
-    console.log('toot toot')
     const [ fullMatch, user, repo, num ] = res.match
-    res.send(user, repo, num)
     gh.getIssues(user, repo).getIssue(num)
       .then(i => {
         const isPR = !!i.data.pull_request
         const { url, title, state } = i.data
-        res.send(`${isPR ? 'PR: ' : ''}[${fullMatch}](${url}) (${state === 'closed' ? 'CLOSED' : 'OPEN'})
-        ${title}`)
+        res.send(`<${url}|${fullMatch}]${isPR ? '-PR: ' : ': '}>${state === 'closed' ? 'CLOSED' : 'OPEN'})\n\t>${title}`)
       })
   })
 
@@ -33,7 +30,7 @@ module.exports = (robot) => {
 const handleIssue = (resp) => i => {
   const isPR = !!i.data.pull_request
   const { url, title, state } = i.data
-  resp.send(`[${fullMatch}](${url}): [${state === 'closed' ? 'CLOSED' : 'OPEN'}]`)
+  resp.send(`<${url}|${fullMatch}]>: [${state === 'closed' ? 'CLOSED' : 'OPEN'}]`)
 }
 
 // const findMatches = (text, acc = []) => {
